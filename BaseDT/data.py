@@ -304,7 +304,7 @@ class ImageData(object):
         sx, sy = original_w / processed_w, original_h / processed_h
         new_boxes = np.array([]).reshape(0, 5)
         for box in boxes:
-            new_box = [box[0] * sx, box[1] * sy, box[2] * sx, box[3] * sy, box[4]]
+            new_box = [box[0] * sy, box[1] * sx, box[2] * sy, box[3] * sx, box[4]]
             new_boxes = np.concatenate([new_boxes, [new_box]], axis=0)
         return new_boxes
 
