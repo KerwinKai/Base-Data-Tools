@@ -158,7 +158,7 @@ def imshow_det_bboxes(img,
         imshow(img, win_name, wait_time)
     return img
 
-def plot_log(log_path, title='训练损失函数图', plot_list='loss'):
+def plot_log(log, title='Loss Graph', plot_list='loss'):
 
     if isinstance(plot_list, str):
         plot_list = [plot_list]
@@ -168,9 +168,6 @@ def plot_log(log_path, title='训练损失函数图', plot_list='loss'):
     for key in plot_list:
         assert key in ['loss','loss_cls','loss_bbox']
 
-    plt.rcParams['font.sans-serif'] = ['SimHei']
-    plt.rcParams['axes.unicode_minus'] = False
-
     iter = []
     loss_dict = {
         'loss': [],
@@ -179,16 +176,22 @@ def plot_log(log_path, title='训练损失函数图', plot_list='loss'):
     }
 
     iter_num = 0
-    with open(log_path,'r') as f:
-        content = f.readlines()
-        for line in content:
-            log = json.loads(line)
-            if 'mode' in log.keys() and log["mode"] == 'train':
-                iter_num += 10
-                iter.append(iter_num)
-                non_empty_keys = log.keys()
-                for axis_y in plot_list:
-                    loss_dict[axis_y].append(log[axis_y])
+
+    if isinstance(log, str):
+        with open(log,'r') as f:
+            content = [json.loads(line) for line in f.readlines()]
+    elif isinstance(log, list):
+        content = log
+    
+    assert isinstance(content, list)
+    for log in content:
+        #log = json.loads(line)
+        if 'mode' in log.keys() and log["mode"] == 'train':
+            iter_num += 10
+            iter.append(iter_num)
+            non_empty_keys = log.keys()
+            for axis_y in plot_list:
+                loss_dict[axis_y].append(log[axis_y])
 
     plt.figure(figsize=(8,6))
     for axis_y in plot_list:
@@ -201,4 +204,4 @@ def plot_log(log_path, title='训练损失函数图', plot_list='loss'):
     plt.show()
     non_empty_keys = [key for key in non_empty_keys if key.startswith('loss')]
     print('The loss function graph is drawn. If you want to add y-axis parameters,'
-          f'please set `{non_empty_keys}` in the plot_list')
+          f' please set `{non_empty_keys}` in the plot_list')
